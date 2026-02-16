@@ -1,26 +1,69 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>My Private Space</title>
+    <title>Ultron Workspace</title>
+    
+    <link rel="apple-touch-icon" href="https://art.pixilart.com/839064244234051.png">
+    <link rel="icon" type="image/png" href="https://art.pixilart.com/839064244234051.png">
+    
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #000; color: #fff; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
-        .app-card { width: 90%; max-width: 400px; padding: 30px; background: #1c1c1e; border-radius: 20px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        h1 { font-size: 24px; margin-bottom: 10px; color: #0a84ff; }
-        p { color: #8e8e93; font-size: 14px; margin-bottom: 20px; }
-        textarea { width: 100%; height: 150px; background: #2c2c2e; border: 1px solid #3a3a3c; border-radius: 10px; color: white; padding: 10px; box-sizing: border-box; font-family: monospace; }
-        .btn { margin-top: 15px; display: inline-block; background: #0a84ff; color: white; padding: 12px 24px; border-radius: 10px; text-decoration: none; font-weight: bold; cursor: pointer; }
+        body { 
+            font-family: -apple-system, system-ui, sans-serif; 
+            background: #0d0d0d; 
+            color: #ff4d4d; /* Ultron Red */
+            margin: 0; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+        }
+        .app-card { 
+            width: 85%; 
+            max-width: 400px; 
+            padding: 25px; 
+            background: #1a1a1a; 
+            border: 2px solid #ff0000; /* Glowing Red Border */
+            border-radius: 20px; 
+            text-align: center; 
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+        }
+        textarea { 
+            width: 100%; 
+            height: 120px; 
+            background: #262626; 
+            border: 1px solid #444; 
+            border-radius: 10px; 
+            color: #fff; 
+            padding: 10px; 
+            margin-top: 15px;
+            box-sizing: border-box;
+        }
+        .btn { 
+            margin-top: 20px; 
+            display: inline-block; 
+            background: #ff0000; 
+            color: #fff; 
+            padding: 12px 24px; 
+            border-radius: 10px; 
+            font-weight: bold; 
+            text-transform: uppercase;
+            cursor: pointer; 
+        }
     </style>
 </head>
 <body>
     <div class="app-card">
-        <h1>Private App</h1>
-        <p>This is your custom workspace.</p>
-        <textarea placeholder="Paste your custom code or notes here..."></textarea>
-        <div class="btn" onclick="alert('Saved to local session!')">Save Draft</div>
+        <img src="https://art.pixilart.com/839064244234051.png" width="80" style="border-radius: 10px;">
+        <h1>System Active</h1>
+        <p>Ultron Terminal: Secure Access Only</p>
+        <textarea placeholder="Input commands or data..."></textarea>
+        <div class="btn" onclick="alert('Data Encrypted')">Upload</div>
     </div>
 </body>
 </html>
