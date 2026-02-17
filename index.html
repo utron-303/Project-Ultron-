@@ -4,13 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Ultron Secure Terminal</title>
-    
     <style>
-        /* This is your original "Red & Black" styling */
         body { font-family: 'Courier New', monospace; background: #000; color: #ff0000; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
         .app-card { width: 85%; max-width: 400px; padding: 30px; background: #0a0a0a; border: 2px solid #ff0000; border-radius: 15px; text-align: center; box-shadow: 0 0 25px rgba(255, 0, 0, 0.4); }
         input { width: 100%; padding: 12px; margin-top: 15px; background: #111; border: 1px solid #ff0000; color: #fff; border-radius: 8px; text-align: center; font-size: 18px; box-sizing: border-box; outline: none; }
-        #strike-zone { color: #ff0000; font-size: 32px; font-weight: bold; margin-top: 20px; min-height: 40px; text-shadow: 0 0 10px #ff0000; }
+        #strike-zone { color: #ff0000; font-size: 24px; font-weight: bold; margin-top: 20px; min-height: 40px; }
         textarea { width: 100%; height: 150px; background: #111; border: 1px solid #444; color: #00ff00; padding: 10px; margin-top: 15px; border-radius: 8px; box-sizing: border-box; font-family: monospace; font-size: 16px; outline: none; }
         .btn { margin-top: 20px; display: inline-block; background: #ff0000; color: #000; padding: 12px 24px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; box-sizing: border-box; text-transform: uppercase; }
         h1 { font-size: 22px; letter-spacing: 2px; }
@@ -22,24 +20,26 @@
         <h1>ACCESS RESTRICTED</h1>
         <p>IDENTIFY YOURSELF</p>
         <input type="password" id="pass-input" placeholder="Enter Code">
-        <div class="btn" id="login-btn">Login</div>
+        <div class="btn" id="login-trigger">Login</div>
         <div id="strike-zone"></div>
     </div>
 
     <div class="app-card" id="secret-content" style="display:none;">
         <h1>SYSTEM ACTIVE</h1>
         <p style="color: #00ff00;">Welcome, Creator.</p>
-        <textarea id="save-box" placeholder="Syncing..."></textarea>
-        <div id="sync-status" style="font-size: 10px; color: #00ff00; margin-top: 5px;">Cloud Ready</div>
+        <textarea id="save-box" placeholder="Loading cloud notes..."></textarea>
+        <div id="sync-status" style="font-size: 10px; color: #00ff00; margin-top: 5px;">Secure Connection Active</div>
         <div class="btn" style="background: #00ff00;" onclick="location.reload()">Lock Terminal</div>
     </div>
 
     <script type="module">
-        // 1. IMPORT FIREBASE
+        // 1. Import Firebase
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // 2. PASTE YOUR KEYS HERE (The ones from the </> icon)// Import the functions you need from the SDKs you need
+        // 2. YOUR FIREBASE CONFIG (Paste your real keys here)
+        const firebaseConfig = {
+            apiKey: "// Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -55,52 +55,67 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
-        const firebaseConfig = {
-            apiKey: "PASTE_HERE",
-            authDomain: "PASTE_HERE",
-            projectId: "PASTE_HERE",
-            storageBucket: "PASTE_HERE",
-            messagingSenderId: "PASTE_HERE",
-            appId: "PASTE_HERE"
+const app = initializeApp(firebaseConfig);",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
         };
 
-        // 3. INITIALIZE
+        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const noteDoc = doc(db, "secrets", "ultron_notes");
 
         const correctPassword = "tc303";
-        const loginBtn = document.getElementById('login-btn');
+        const loginBtn = document.getElementById('login-trigger');
         const passInput = document.getElementById('pass-input');
-        const saveBox = document.getElementById('save-box');
+        const strikeZone = document.getElementById('strike-zone');
 
-        // 4. LOGIN LOGIC
-        async function checkPass() {
-            if (passInput.value === correctPassword) {
+        // 3. THE LOGIN FUNCTION
+        async function runLogin() {
+            const entered = passInput.value.trim();
+            
+            if (entered === correctPassword) {
+                // Switch screens
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('secret-content').style.display = 'block';
                 
-                // Pull data from Database
-                const docSnap = await getDoc(noteDoc);
-                if (docSnap.exists()) {
-                    saveBox.value = docSnap.data().content;
+                // Fetch notes from cloud
+                try {
+                    const docSnap = await getDoc(noteDoc);
+                    if (docSnap.exists()) {
+                        document.getElementById('save-box').value = docSnap.data().content;
+                    }
+                } catch (err) {
+                    console.error("Cloud error:", err);
                 }
             } else {
-                document.getElementById('strike-zone').innerText = "DENIED";
+                strikeZone.innerText = "ACCESS DENIED";
                 passInput.value = "";
             }
         }
 
-        // 5. ATTACH EVENTS (Since 'type=module' hides functions from HTML)
-        loginBtn.addEventListener('click', checkPass);
-        passInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') checkPass(); });
+        // 4. ATTACH THE CLICK EVENT (This fixes the broken button)
+        loginBtn.addEventListener('click', () => {
+            runLogin();
+        });
 
-        // 6. AUTO-SAVE LOGIC
-        saveBox.addEventListener('input', async () => {
-            document.getElementById('sync-status').innerText = "Saving...";
-            await setDoc(noteDoc, { content: saveBox.value });
-            document.getElementById('sync-status').innerText = "Synced to Cloud";
+        // Also allow the "Enter" key to work
+        passInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') runLogin();
+        });
+
+        // 5. AUTO-SAVE TO CLOUD
+        document.getElementById('save-box').addEventListener('input', async (e) => {
+            document.getElementById('sync-status').innerText = "Syncing...";
+            try {
+                await setDoc(noteDoc, { content: e.target.value });
+                document.getElementById('sync-status').innerText = "Cloud Synced";
+            } catch (err) {
+                document.getElementById('sync-status').innerText = "Sync Failed!";
+            }
         });
     </script>
 </body>
