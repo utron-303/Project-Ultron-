@@ -1,86 +1,85 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Ultron Secure Terminal</title>
-    
-    <link rel="apple-touch-icon" href="https://art.pixilart.com/839064244234051.png">
-    <link rel="icon" type="image/png" href="https://art.pixilart.com/839064244234051.png">
-    
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    
-    <style>
-        body { font-family: 'Courier New', monospace; background: #000; color: #ff0000; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
-        .app-card { width: 85%; max-width: 400px; padding: 30px; background: #0a0a0a; border: 2px solid #ff0000; border-radius: 15px; text-align: center; box-shadow: 0 0 25px rgba(255, 0, 0, 0.4); }
-        input { width: 100%; padding: 12px; margin-top: 15px; background: #111; border: 1px solid #ff0000; color: #fff; border-radius: 8px; text-align: center; font-size: 18px; box-sizing: border-box; outline: none; }
-        #strike-zone { color: #ff0000; font-size: 32px; font-weight: bold; margin-top: 20px; min-height: 40px; text-shadow: 0 0 10px #ff0000; }
-        #secret-content { display: none; } 
-        textarea { width: 100%; height: 150px; background: #111; border: 1px solid #444; color: #00ff00; padding: 10px; margin-top: 15px; border-radius: 8px; box-sizing: border-box; font-family: monospace; font-size: 16px; outline: none; }
-        .btn { margin-top: 20px; display: inline-block; background: #ff0000; color: #000; padding: 12px 24px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; box-sizing: border-box; text-transform: uppercase; }
-        h1 { font-size: 22px; letter-spacing: 2px; }
-    </style>
-</head>
-<body>
-
-    <div class="app-card" id="login-screen">
-        <img src="https://art.pixilart.com/839064244234051.png" width="80">
+<div class="app-card" id="login-screen">
         <h1>ACCESS RESTRICTED</h1>
-        <p>IDENTIFY YOURSELF</p>
-        <input type="password" id="pass-input" placeholder="Enter Code" autocomplete="off"梳 autocapitalize="off"攻击 spellcheck="false">
+        <input type="password" id="pass-input" placeholder="Enter Code">
         <div class="btn" onclick="checkPass()">Login</div>
         <div id="strike-zone"></div>
     </div>
 
-    <div class="app-card" id="secret-content">
-        <h1>SYSTEM ACTIVE</h1>
-        <p style="color: #00ff00;">Welcome, Creator.</p>
-        <textarea id="save-box" placeholder="Paste codes or notes here..."></textarea>
-        <div class="btn" style="background: #00ff00;" onclick="location.reload()">Lock Terminal</div>
+    <div class="app-card" id="secret-content" style="display:none;">
+        <h1 style="color: #00ff00;">CLOUD TERMINAL ACTIVE</h1>
+        <textarea id="save-box" placeholder="Syncing with encrypted cloud..."></textarea>
+        <div id="status" style="font-size: 10px; color: #00ff00; margin-top: 5px;">All changes synced.</div>
+        <div class="btn" style="background: #00ff00;" onclick="location.reload()">Lock & Exit</div>
     </div>
 
-    <script>
-        let strikes = 0;
-        
-        // --- YOUR PASSWORD ---
-        const correctPassword = "tc303"; 
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+      import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // Make "Enter" key work
-        document.getElementById('pass-input').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                checkPass();
+      // PASTE YOUR FIREBASE CONFIG HERE FROM THE FIREBASE CONSOLE// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyDPHicglEi7HDlHstg2-hmfdGcv3xyhoJ4",
+  authDomain: "ultron-terminal.firebaseapp.com",
+  projectId: "ultron-terminal",
+  storageBucket: "ultron-terminal.firebasestorage.app",
+  messagingSenderId: "767294075998",
+  appId: "1:767294075998:web:86526ee6554388cd2ef0cf"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+      const firebaseConfig = {
+        apiKey: "YOUR_API_KEY",
+        authDomain: "your-project.firebaseapp.com",
+        projectId: "your-project-id",
+        storageBucket: "your-project.appspot.com",
+        messagingSenderId: "123456789",
+        appId: "1:12345:web:abcde"
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+      const noteDoc = doc(db, "secrets", "ultron_notes");
+
+      const passInput = document.getElementById('pass-input');
+      const saveBox = document.getElementById('save-box');
+      const status = document.getElementById('status');
+
+      // 1. Check Password & Load from DB
+      window.checkPass = async () => {
+        if (passInput.value === "tc303") {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('secret-content').style.display = 'block';
+            
+            // Fetch from Database
+            const docSnap = await getDoc(noteDoc);
+            if (docSnap.exists()) {
+                saveBox.value = docSnap.data().content;
             }
-        });
-
-        // Load saved notes when page starts
-        document.getElementById('save-box').value = localStorage.getItem('ultron_notes') || "";
-
-        // Save notes as you type
-        document.getElementById('save-box').addEventListener('input', function() {
-            localStorage.setItem('ultron_notes', this.value);
-        });
-
-        function checkPass() {
-            const inputField = document.getElementById('pass-input');
-            const strikeZone = document.getElementById('strike-zone');
-            const enteredValue = inputField.value.trim();
-
-            if (enteredValue === correctPassword) {
-                document.getElementById('login-screen').style.display = 'none';
-                document.getElementById('secret-content').style.display = 'block';
-            } else {
-                strikes++;
-                if (strikes < 3) {
-                    strikeZone.innerHTML = "STRIKE " + strikes;
-                } else {
-                    strikeZone.innerHTML = "STRIKE 3<br>LOCKED";
-                    inputField.disabled = true;
-                    inputField.style.opacity = "0.5";
-                }
-                inputField.value = ""; 
-            }
+        } else {
+            alert("ACCESS DENIED");
         }
+      };
+
+      // 2. Auto-Save to Database (with "Debounce" to save battery/data)
+      let timeout = null;
+      saveBox.addEventListener('input', () => {
+        status.innerText = "Syncing...";
+        clearTimeout(timeout);
+        
+        timeout = setTimeout(async () => {
+            try {
+                await setDoc(noteDoc, { content: saveBox.value });
+                status.innerText = "Cloud Synced.";
+            } catch (e) {
+                status.innerText = "Sync Error!";
+                console.error(e);
+            }
+        }, 1000); // Wait 1 second after typing stops to save
+      });
     </script>
-</body>
-</html>
